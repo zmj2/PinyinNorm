@@ -43,7 +43,7 @@ project-root/
 ├── requirements.txt
 └── README.md
 
-````
+```
 
 ---
 
@@ -53,9 +53,23 @@ project-root/
 
 ```bash
 pip install -r requirements.txt
-````
+```
 
-### 2. Run normalization
+### 2. Copy Pinyin2Hanzi module
+
+> This project depends on the [`Pinyin2Hanzi`](https://github.com/letiantian/Pinyin2Hanzi) library
+> Please clone or copy the `Pinyin2Hanzi` folder into the project root.
+
+```bash
+git clone https://github.com/letiantian/Pinyin2Hanzi.git
+cp -r Pinyin2Hanzi ./Pinyin2Hanzi
+```
+
+> Or download manually and ensure `Pinyin2Hanzi/` is in the same folder as `main.py`.
+
+---
+
+### 3. Run normalization
 
 ```bash
 python main.py "doubi脸太gwi则了"
@@ -105,4 +119,6 @@ Xiamen University, China
 
 * 📧 Email: [barryjoth@gmail.com](mailto:barryjoth@gmail.com)
 * 🧠 WeChat: `zmj_418`
+
+
 
