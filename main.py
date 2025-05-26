@@ -16,13 +16,15 @@ def truncate_candidate_lists(candidate_lists, threshold):
     truncated = [clist[:max_k] for clist in candidate_lists]
     return truncated
 
-def normalize_sentence(sentence, candidate_generator, scorer, topk=5, max_comb=1000):
+def normalize_sentence(sentence, candidate_generator, scorer, topk=5, max_comb=100):
     tokens = tokenize(sentence)
     print("🔍 分词结果：", tokens)
 
     candidate_lists = []
+    print("\n🎯 候选结果（按优先级排序）：")
     for token in tokens:
-        cands = list(set(candidate_generator.get_candidates(token)))
+        cands = candidate_generator.get_candidates(token)
+        print(f"{token} => {cands}")
         if not cands:
             cands = [token]
         candidate_lists.append(cands)
@@ -31,7 +33,7 @@ def normalize_sentence(sentence, candidate_generator, scorer, topk=5, max_comb=1
     for c in candidate_lists:
         total_comb *= len(c)
     if total_comb > max_comb:
-        print(f"⚠️ 候选组合过多（{total_comb}），已截断部分候选以提升性能")
+        print(f"\n⚠️ 候选组合过多（{total_comb}），已截断部分候选以提升性能")
         candidate_lists = truncate_candidate_lists(candidate_lists, threshold=max_comb)
 
     all_sentences = [''.join(words) for words in product(*candidate_lists)]
@@ -54,6 +56,9 @@ if __name__ == "__main__":
     scorer = GPT2Scorer()
 
     result = normalize_sentence(raw_input, generator, scorer)
+    print("\n📌 相对最优输出结果：")
     print(result)
+
     print("\n✅ 最佳规范化结果：", result[0][0])
     print("🔢 得分：", result[0][1])
+
