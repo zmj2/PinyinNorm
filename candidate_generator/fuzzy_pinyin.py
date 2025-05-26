@@ -18,7 +18,7 @@ def expand_fuzzy(py):
                 expanded.append(py.replace(key, alt))
     return list(set(expanded))
 
-def generate_by_fuzzy_pinyin(origin_pinyin, pinyin_to_words, topk=5):
+def generate_by_fuzzy_pinyin(origin_pinyin, pinyin_to_words, topk=5, candidates=None):
 
     if isinstance(origin_pinyin, str):
         if ' ' not in origin_pinyin:
@@ -30,16 +30,17 @@ def generate_by_fuzzy_pinyin(origin_pinyin, pinyin_to_words, topk=5):
 
     fuzzy_pinyin_seqs = [' '.join(seq) for seq in product(*fuzzy_lists)]
     
-    candidates = set()
+    if candidates is None:
+        candidates = set()
     results = []
 
     for idx, py_seq in enumerate(fuzzy_pinyin_seqs):
         if py_seq in pinyin_to_words:
             for w in pinyin_to_words[py_seq]:
                 if w not in candidates:
-                    results.append({"word": w, "source": "static_dict", "confidence": 0.6 - idx * 0.01})
+                    results.append({"word": w, "source": "fuzzy_static_dict", "confidence": 0.6 - idx * 0.01})
 
-        new = generate_from_pinyin(py_seq, topk=topk, static_dict=pinyin_to_words)
+        new = generate_from_pinyin(py_seq, topk=topk, static_dict=pinyin_to_words, candidates=candidates)
         for item in new:
             if item["word"] not in candidates:
                 item["source"] = "fuzzy_pinyin"
