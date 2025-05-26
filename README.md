@@ -101,7 +101,7 @@ MIT License.
 
 ## 🙏 Acknowledgments
 
-* [jieba](https://github.com/fxsjy/jieba)
+* [pkuseg](https://github.com/lancopku/pkuseg-python)
 * [pypinyin](https://github.com/mozillazg/python-pinyin)
 * [python-Levenshtein](https://github.com/ztane/python-Levenshtein)
 * [transformers](https://github.com/huggingface/transformers)
