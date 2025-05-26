@@ -66,11 +66,11 @@ class CandidateGenerator:
         # 5 拼音输入法候选（全拼/首字母/模糊拼音）
         py_seq, py_initials = normalize_to_pinyin(word)
         if py_seq != py_initials:
-            candidates.extend(generate_from_pinyin(py_seq, static_dict=self.pinyin_to_words))
-            candidates.extend(generate_from_pinyin(py_initials, static_dict=self.pinyin_to_words))
+            candidates.extend(generate_from_pinyin(py_seq, static_dict=self.pinyin_to_words, candidates=added))
+            candidates.extend(generate_from_pinyin(py_initials, static_dict=self.pinyin_to_words, candidates=added))
         else:
-            candidates.extend(generate_from_pinyin(py_seq, static_dict=self.pinyin_to_words))
-        candidates.extend(generate_by_fuzzy_pinyin(py_seq, self.pinyin_to_words))
+            candidates.extend(generate_from_pinyin(py_seq, static_dict=self.pinyin_to_words, candidates=added))
+        candidates.extend(generate_by_fuzzy_pinyin(py_seq, self.pinyin_to_words, candidates=added))
         
         # 6 编辑距离近似词
         if should_use_edit_distance(word):
@@ -83,7 +83,6 @@ class CandidateGenerator:
         # 7 拼音序列seq2seq解码
         # candidates.update(generate_by_seq2seq(...))
 
-        print(self.sort_candidates(candidates))
         return self.sort_candidates(candidates)
     
     def sort_candidates(self, candidates):
@@ -92,9 +91,11 @@ class CandidateGenerator:
             "static_dict": 1,
             "component": 2,
             "pinyin_static": 3,
-            "pinyin": 4,
-            "fuzzy_pinyin": 5,
-            "edit_distance": 6,
+            "pinyin_static_dict": 4,
+            "pinyin": 5,
+            "fuzzy_static_dict": 6,
+            "fuzzy_pinyin": 7,
+            "edit_distance": 8,
             "other": 99
         }
 
