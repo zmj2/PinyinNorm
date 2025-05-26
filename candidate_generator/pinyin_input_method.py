@@ -72,7 +72,7 @@ def split_pinyin_string(pinyin_str, pinyin_vocab):
     return result
 
 
-def generate_from_pinyin2hanzi(pinyin_str: str, topk=5, score_threshold=0.2):
+def generate_from_pinyin2hanzi(pinyin_str: str, topk=5, score_threshold=0.15):
     pinyin_list = pinyin_str.strip().split()
     try:
         results = dag(dagparams, pinyin_list, path_num=topk)
@@ -90,14 +90,15 @@ def generate_from_pinyin2hanzi(pinyin_str: str, topk=5, score_threshold=0.2):
     except:
         return []
     
-def generate_from_pinyin(pinyin_str: str, topk=5, method='pinyin2hanzi', static_dict=None) -> list:
+def generate_from_pinyin(pinyin_str: str, topk=5, method='pinyin2hanzi', static_dict=None, candidates=None) -> list:
     '''
     输入一个拼音字符串，输出前topk个可能的汉字词。
     '''
     if not pinyin_str.strip():
         return []
     
-    candidates = set()
+    if candidates is None:
+        candidates = set()
     results = []
 
     def add(word, score, src):
@@ -111,7 +112,7 @@ def generate_from_pinyin(pinyin_str: str, topk=5, method='pinyin2hanzi', static_
             for seq in expanded_seqs:
                 if static_dict and seq in static_dict:
                     for w in static_dict[seq]:
-                        add(w, 0.5, "static_dict")
+                        add(w, 0.5, "pinyin_static_dict")
                 for w, s in generate_from_pinyin2hanzi(seq, topk):
                     add(w, s - 0.1, "pinyin")
         else:
@@ -119,7 +120,7 @@ def generate_from_pinyin(pinyin_str: str, topk=5, method='pinyin2hanzi', static_
                 pinyin_str = ' '.join(split_pinyin_string(pinyin_str, pinyin_syllables))
             if static_dict and pinyin_str in static_dict:
                 for w in static_dict[pinyin_str]:
-                    add(w, 0.5, "static_dict")
+                    add(w, 0.5, "pinyin_static_dict")
             for w, s in generate_from_pinyin2hanzi(pinyin_str, topk):
                 add(w, s, "pinyin")
 
@@ -128,3 +129,19 @@ def generate_from_pinyin(pinyin_str: str, topk=5, method='pinyin2hanzi', static_
         return []
     else:
         return []
+    
+
+def test_pinyin2hanzi(pinyin_str, topk=10):
+    print(f"🔍 测试拼音输入：{pinyin_str}")
+    pinyin_list = pinyin_str.strip().split()
+    results = dag(dagparams, pinyin_list, path_num=topk)
+
+    for i, item in enumerate(results):
+        try:
+            word = ''.join([node.word for node in item.path])
+        except AttributeError:
+            word = ''.join(item.path)
+        print(f"{i+1:>2}. {word:<10}  得分: {item.score:.4f}")
+
+if __name__ == "__main__":
+    test_pinyin2hanzi("jingcha")
